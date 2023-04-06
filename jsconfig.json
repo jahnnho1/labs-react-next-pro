@@ -12,7 +12,9 @@
       "@styles/*": ["styles/*"],
       "@hooks/*": ["hooks/*"],
       "@layout/*": ["layout/*"],
-      "@common/*": ["common/*"]
+      "@common/*": ["common/*"],
+      "@services/*": ["services/*"],
+      "@utils/*": ["utils/*"],
     }
   }
 }

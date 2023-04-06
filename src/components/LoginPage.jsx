@@ -1,11 +1,12 @@
 import { useRef } from 'react';
 import { LockClosedIcon } from '@heroicons/react/solid';
 import Image from 'next/image';
-
-
+import { useAuth } from '@hooks/useAuth';
+import { validateEmail, validatePassword } from '@utils/formValidations';
 
 export default function LoginPage() {
   const formRef = useRef(null);
+  const auth = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -13,10 +14,19 @@ export default function LoginPage() {
     const data = Object.fromEntries(formData);
     const email = data.email;
     const password = data.password;
-    console.log(email, password);
+
+    if (!validateEmail(email) || !validatePassword(password)) {
+      console.log('Invalid email or password');
+      return;
+    }
+
+    auth.signIn(email, password).then((res) => {
+      console.log('Login success', res);
+      auth.getUser().then((res) => {
+        console.log('User', res);
+      });
+    });
   };
-
-
 
   return (
     <>
@@ -34,13 +44,13 @@ export default function LoginPage() {
                   Email address
                 </label>
                 <input
-                  id='email-address'
-                  name='email'
-                  type='email'
-                  autoComplete='email'
+                  id="email-address"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
                   required
-                  className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
-                  placeholder='Email address'
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Email address"
                 />
               </div>
               <div>
@@ -48,12 +58,12 @@ export default function LoginPage() {
                   Password
                 </label>
                 <input
-                  id='password'
-                  name='password'
-                  type='password'
+                  id="password"
+                  name="password"
+                  type="password"
                   required
-                  className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
-                  placeholder='********'
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="********"
                 />
               </div>
             </div>
@@ -76,7 +86,7 @@ export default function LoginPage() {
             <div>
               <button
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                type='submit'
+                type="submit"
               >
                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                   <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true" />
