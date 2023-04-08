@@ -1,12 +1,15 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { LockClosedIcon } from '@heroicons/react/solid';
 import Image from 'next/image';
 import { useAuth } from '@hooks/useAuth';
 import { validateEmail, validatePassword } from '@utils/formValidations';
+import { useRouter } from 'next/router';
 
 export default function LoginPage() {
   const formRef = useRef(null);
   const auth = useAuth();
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,16 +19,20 @@ export default function LoginPage() {
     const password = data.password;
 
     if (!validateEmail(email) || !validatePassword(password)) {
-      console.log('Invalid email or password');
+      setError('Invalid email or password');
       return;
     }
 
-    auth.signIn(email, password).then((res) => {
-      console.log('Login success', res);
-      auth.getUser().then((res) => {
-        console.log('User', res);
+    auth
+      .signIn(email, password)
+      .then(() => {
+        setError(null);
+        router.push('/dashboard');
+      })
+      .catch((err) => {
+        console.log('Login error', err);
+        setError('Invalid email or password');
       });
-    });
   };
 
   return (
@@ -67,7 +74,7 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-
+            {error && <div className="text-red-500 text-sm">{error}</div>}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
@@ -75,7 +82,6 @@ export default function LoginPage() {
                   Remember me
                 </label>
               </div>
-
               <div className="text-sm">
                 <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
                   Forgot your password?
@@ -84,10 +90,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <button
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                type="submit"
-              >
+              <button className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" type="submit">
                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                   <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true" />
                 </span>

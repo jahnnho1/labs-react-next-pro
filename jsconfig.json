@@ -14,7 +14,7 @@
       "@layout/*": ["layout/*"],
       "@common/*": ["common/*"],
       "@services/*": ["services/*"],
-      "@utils/*": ["utils/*"],
+      "@utils/*": ["utils/*"]
     }
   }
 }

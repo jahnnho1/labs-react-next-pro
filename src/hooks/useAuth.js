@@ -16,36 +16,38 @@ export const useAuth = () => {
 
 function useProvideAuth() {
   const [user, setUser] = useState(null);
-
   const signIn = async (email, password) => {
-    const response = await fetch(endPoints.auth.login, {
-      method: 'POST',
-      headers: {
-        accept: '*/*',
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await response.json();
-    Cookie.set('token', data.access_token);
-    return data;
-  };
-
-  const getUser = async () => {
-    const response = await fetch(endPoints.auth.profile, {
-      method: 'GET',
-      headers: {
-        accept: '*/*',
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: `Bearer ${Cookie.get('token')}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    try {
+      const options = {
+        method: 'POST',
+        headers: {
+          accept: '*/*',
+          'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify({ email, password }),
+      };
+      const response = await fetch(endPoints.auth.login, options);
+      const data = await response.json();
+      Cookie.set('token', data.access_token, { expires: 5 });
+      if (response.ok) {
+        const options = {
+          method: 'GET',
+          headers: {
+            accept: '*/*',
+            'Content-Type': 'application/json;charset=utf-8',
+            Authorization: `Bearer ${Cookie.get('token')}`,
+          },
+        };
+        const response = await fetch(endPoints.auth.profile, options);
+        const data = await response.json();
         setUser(data);
         return data;
-      });
-    return response;
+      } else {
+        throw new Error('Invalid email or password');
+      }
+    } catch (error) {
+      throw new Error('Invalid email or password');
+    }
   };
 
   const signOut = () => {
@@ -59,7 +61,6 @@ function useProvideAuth() {
   return {
     user,
     signIn,
-    getUser,
     signOut,
   };
 }
