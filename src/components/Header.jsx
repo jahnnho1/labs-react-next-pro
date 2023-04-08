@@ -9,7 +9,7 @@ import { useAuth } from '@hooks/useAuth';
 const navigation = [
   { name: 'Home', href: '/', current: true },
   { name: 'Dashboard', href: '/dashboard/', current: false },
-  { name: 'Ventas', href: '#', current: false },
+  { name: 'Products', href: '/dashboard/products', current: false },
   { name: 'Login', href: '/login', current: false },
 ];
 const userNavigation = [
@@ -72,7 +72,7 @@ export default function Header() {
                       <div>
                         <Menu.Button className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                           <span className="sr-only">Open user menu</span>
-                          <Image className="h-8 w-8 rounded-full" src={userData.imageUrl} alt="" width={100} height={100} />
+                          <Image className="h-8 w-8 rounded-full" src='https://cdna.artstation.com/p/assets/images/images/046/235/272/smaller_square/pixel-arts-de-un-nino-random-ranita-uwu.jpg?1644605499' alt="" width={100} height={100} />
                         </Menu.Button>
                       </div>
                       <Transition

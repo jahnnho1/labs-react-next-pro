@@ -1,17 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 const useFetch = (endpoint) => {
   const [products, setProducts] = useState([]);
-  //const [isLoading, setLoading] = useState(false);
 
-  // async function fetchData() {
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const response = await fetch(endpoint);
     const data = await response.json();
     setProducts(data);
-    //setLoading(false);
-    return data;
-  };
+  }, [endpoint]);
 
   useEffect(() => {
     try {
@@ -19,8 +15,8 @@ const useFetch = (endpoint) => {
     } catch (error) {
       console.log(error);
     }
-  }, []);
-
+  }, [fetchData]);
   return products;
 };
+
 export default useFetch;

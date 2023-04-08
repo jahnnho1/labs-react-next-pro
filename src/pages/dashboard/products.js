@@ -1,34 +1,44 @@
-import useFetch from '@hooks/useFetch';
-import endPoints from '@services/api';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Chart } from '@common/Chart';
-const PRODUCT_LIMIT = 15;
-const PRODUCT_OFFSET = 5;
+import { PlusIcon } from '@heroicons/react/solid';
+import Modal from '@common/Modal';
+import endPoints from '@services/api';
+import AddProduct from '@components/AddProduct';
 
-export default function Dashboard() {
-  const products = useFetch(endPoints.products.getProducts(PRODUCT_LIMIT, PRODUCT_OFFSET));
+export default function Products() {
+  const [products, setProducts] = useState([]);
+  const [open, setOpen] = useState(false);
 
-  const categoryNames = products?.map((product) => product.category);
-  const categoryCount = categoryNames?.map((category) => category.name);
-//  console.log(categoryCount);
+  useEffect(() => {
+    async function loadProducts() {
+      const response = await fetch(endPoints.products.allProducts);
+      const data = await response.json();
+      setProducts(data);
+    }
+    loadProducts();
+  }, []);
 
-  const countOcurrences = (data) => data.reduce((object, index) => ((object[index] = ++object[index] || 1), object), {});
-  console.log(countOcurrences(categoryCount));
-  const data = {
-    datasets: [
-      {
-        label: 'Categories',
-        data: countOcurrences(categoryCount),
-        borderWidth: 2,
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#FF6384', '#36A2EB'],
-      },
-    ],
-  };
-
-
+  console.log(products);
   return (
     <>
-      <Chart className="mb-8 mt-2" chartData={data} />
+      <div className="lg:flex lg:items-center lg:justify-between mb-8">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">List of Products</h2>
+        </div>
+        <div className="mt-5 flex lg:ml-4 lg:mt-0">
+          <span className="sm:ml-3">
+            <button
+              type="button"
+              className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              onClick={() => setOpen(true)}
+            >
+              <PlusIcon className="-ml-0.5 mr-1.5 h-5 w-5" aria-hidden="true" />
+              Add Product
+            </button>
+          </span>
+        </div>
+      </div>
+
       <div className="flex flex-col">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -62,7 +72,7 @@ export default function Dashboard() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
-                            <Image className="h-10 w-10 rounded-full" src='https://cdna.artstation.com/p/assets/images/images/046/235/272/smaller_square/pixel-arts-de-un-nino-random-ranita-uwu.jpg?1644605499' alt="" width={100} height={100} />
+                            <Image className="h-10 w-10 rounded-full" src="https://cdna.artstation.com/p/assets/images/images/046/235/272/smaller_square/pixel-arts-de-un-nino-random-ranita-uwu.jpg?1644605499" alt="" width={100} height={100} />
                           </div>
                         </div>
                       </td>
@@ -93,6 +103,11 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {open ? (
+        <Modal open={open} setOpen={setOpen}>
+          <AddProduct />
+        </Modal>
+      ) : null}
     </>
   );
 }
