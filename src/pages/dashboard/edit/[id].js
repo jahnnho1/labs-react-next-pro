@@ -9,16 +9,15 @@ export default function Edit() {
 
   useEffect(() => {
     const { id } = router.query;
-    if (!router.isReady) return;
-
+    if (!router.isReady || !id) return;
     async function getProduct() {
       const response = await fetch(endPoints.products.getProduct(id));
       const data = await response.json();
       setProduct(data);
     }
-
     getProduct();
-  }, [router?.isReady]);
+
+  }, []);
 
   return <FormProduct product={product} />;
 }
