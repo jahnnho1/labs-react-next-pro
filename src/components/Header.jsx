@@ -1,34 +1,42 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline';
 import Image from 'next/image';
 import { useAuth } from '@hooks/useAuth';
-
-const navigation = [
-  { name: 'Home', href: '/', current: true },
-  { name: 'Dashboard', href: '/dashboard/', current: false },
-  { name: 'Products', href: '/dashboard/products', current: false },
-  { name: 'Login', href: '/login', current: false },
-];
-const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-];
+import Cookie from 'js-cookie';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 export default function Header() {
+  const token = Cookie.get('user-token');
+  const [userData, setUserData] = useState({});
   const auth = useAuth();
 
-  const userData = {
-    name: auth?.user?.name,
-    email: auth?.user?.email,
-    imageUrl: `https://ui-avatars.com/api/?name=${auth?.user?.name}`,
-  };
+  useEffect(() => {
+    if (token) {
+      try {
+        const user = JSON.parse(token);
+        setUserData(user);
+      } catch (error) {
+        console.error('Error parsing user:', error);
+      }
+    }
+  }, [token]);
 
+  const navigation = [
+    { name: 'Home', href: '/', current: true, role: 'none' },
+    { name: 'Dashboard', href: '/dashboard/', current: false, role: 'admin' },
+    { name: 'Products', href: '/dashboard/products', current: false, role: 'customer' },
+    { name: 'Login', href: '/login', current: false, role: 'login' },
+  ];
+  const userNavigation = [
+    { name: 'Your Profile', href: '#' },
+    { name: 'Settings', href: '#' },
+  ];
+  
   return (
     <>
       <Disclosure as="nav" className="bg-gray-800">
@@ -42,11 +50,22 @@ export default function Header() {
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-10 flex items-baseline space-x-4">
-                      {navigation.map((item) => (
-                        <a key={item.name} href={item.href} className={classNames(item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'px-3 py-2 rounded-md text-sm font-medium')} aria-current={item.current ? 'page' : undefined}>
-                          {item.name}
-                        </a>
-                      ))}
+                      {navigation.map((item) => {
+                        if ((item.role === 'customer' && userData.role === 'customer') || item.role === 'none') {
+                          return (
+                            <a key={`nav-${item.name}`} href={item.href} className={classNames(item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'px-3 py-2 rounded-md text-sm font-medium')} aria-current={item.current ? 'page' : undefined}>
+                              {item.name}
+                            </a>
+                          );
+                        }
+                        else if (item.role === 'login' && Object.keys(userData).length === 0) {
+                          return (
+                            <a key={`navDesktop-${item.name}`} href={item.href} className={classNames(item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'px-3 py-2 rounded-md text-sm font-medium')} aria-current={item.current ? 'page' : undefined}>
+                              {item.name}
+                            </a>
+                          );
+                        }
+                      })}
                     </div>
                   </div>
                 </div>
@@ -56,7 +75,6 @@ export default function Header() {
                       <span className="sr-only">View notifications</span>
                       <BellIcon className="h-6 w-6" aria-hidden="true" />
                     </button>
-
                     {/* Profile dropdown */}
                     <Menu as="div" className="ml-3 relative">
                       <div>
@@ -67,9 +85,15 @@ export default function Header() {
                       </div>
                       <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="transform opacity-0 scale-95" enterTo="transform opacity-100 scale-100" leave="transition ease-in duration-75" leaveFrom="transform opacity-100 scale-100" leaveTo="transform opacity-0 scale-95">
                         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <button onClick={() => auth.logout()} className="block px-4 py-2 text-sm text-gray-700">
-                            Logout
-                          </button>
+                          {Cookie.get('token') ? (
+                            <button onClick={() => auth.logout()} className="block px-4 py-2 text-sm text-gray-700">
+                              Logout
+                            </button>
+                          ) : (
+                            <button onClick={() => auth.logout()} className="block px-4 py-2 text-sm text-gray-700">
+                              Login
+                            </button>
+                          )}
                         </Menu.Items>
                       </Transition>
                     </Menu>

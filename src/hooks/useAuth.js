@@ -40,6 +40,8 @@ function useProvideAuth() {
         };
         const response = await fetch(endPoints.auth.profile, options);
         const data = await response.json();
+        const json = JSON.stringify(data);
+        Cookie.set('user-token', json);
         setUser(data);
         return data;
       } else {
@@ -53,6 +55,7 @@ function useProvideAuth() {
   const logout = () => {
     setUser(null);
     Cookie.remove('token');
+    Cookie.remove('user-token');
     const headers = new Headers();
     headers.delete('Authorization');
     window.location.href = '/login';
