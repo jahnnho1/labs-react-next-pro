@@ -1,8 +1,12 @@
 import { useRef } from 'react';
-import { addProduct } from '@services/api/product';
+import { addProduct, updateProduct } from '@services/api/product';
+import Link from 'next/link';
+import { Router, useRouter } from 'next/router';
 
-export default function AddProduct() {
+export default function FormProduct({ setOpen, setAlert, product }) {
   const formRef = useRef(null);
+  const router = useRouter();
+  console.log(product);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,9 +20,27 @@ export default function AddProduct() {
       categoryId: parseInt(data.categoria),
       images: ['https://cdna.artstation.com/p/assets/images/images/046/235/272/smaller_square/pixel-arts-de-un-nino-random-ranita-uwu.jpg?1644605499'],
     };
-    addProduct(obj).then((res) => {
-      console.log(res);
-    });
+
+    if (product) {
+      updateProduct(product.id, obj)
+        .then(() => {
+          console.log('Product updated successfully');
+          router.push('/dashboard/products');
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      addProduct(obj)
+        .then(() => {
+          setAlert({ active: true, message: 'Product added successfully', type: 'success', autoClose: false });
+          setOpen(false);
+        })
+        .catch((err) => {
+          setAlert({ active: true, message: err.message, type: 'error', autoClose: false });
+          setOpen(false);
+        });
+    }
   };
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
@@ -33,7 +55,14 @@ export default function AddProduct() {
                 Title
               </label>
               <div className="mt-2">
-                <input type="text" name="title" id="title" autoComplete="given-name" className="block w-full rounded-md border-0 py-2 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                <input
+                  defaultValue={product?.title}
+                  type="text"
+                  name="title"
+                  id="title"
+                  autoComplete="given-name"
+                  className="block w-full rounded-md border-0 py-2 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
               </div>
             </div>
 
@@ -43,6 +72,7 @@ export default function AddProduct() {
               </label>
               <div className="mt-2">
                 <input
+                  defaultValue={product?.description}
                   type="text"
                   name="descripcion"
                   id="descripcion"
@@ -57,7 +87,13 @@ export default function AddProduct() {
                 Precio
               </label>
               <div className="mt-2">
-                <input id="precio" name="precio" type="number" className="block w-full pl-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                <input
+                  defaultValue={product?.price}
+                  id="precio"
+                  name="precio"
+                  type="number"
+                  className="block w-full pl-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
               </div>
             </div>
 
@@ -66,7 +102,14 @@ export default function AddProduct() {
                 Categoria
               </label>
               <div className="mt-2">
-                <select id="categoria" name="categoria" autoComplete="categoria-name" className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <select
+                  defaultValue={product?.category?.id}
+                  value={product?.category?.id}
+                  id="categoria"
+                  name="categoria"
+                  autoComplete="categoria-name"
+                  className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
                   <option value="1">Clothes</option>
                   <option value="2">Electronics</option>
                   <option value="3">Furniture</option>
@@ -81,7 +124,7 @@ export default function AddProduct() {
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-          Cancel
+          <Link href={`/dashboard/products`}> cancelar</Link>
         </button>
         <button type="submit" className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
           Save

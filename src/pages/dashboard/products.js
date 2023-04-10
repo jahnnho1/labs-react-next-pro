@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { PlusIcon } from '@heroicons/react/solid';
+import { PlusIcon, FolderRemoveIcon } from '@heroicons/react/solid';
 import Modal from '@common/Modal';
 import endPoints from '@services/api';
-import AddProduct from '@components/AddProduct';
+import FormProduct from '@components/FormProduct';
+import useAlert from '@hooks/useAlert';
+import Alert from '@common/Alert';
+import { deleteProduct } from '@services/api/product';
+import Link from 'next/link';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
+  const { alert, setAlert, toggleAlert } = useAlert();
 
   useEffect(() => {
     async function loadProducts() {
@@ -16,11 +21,31 @@ export default function Products() {
       setProducts(data);
     }
     loadProducts();
-  }, []);
+  }, [alert]);
 
-  console.log(products);
+  const handleDelete = async (id) => {
+    deleteProduct(id)
+      .then(() => {
+        setAlert({
+          active: true,
+          message: 'Product deleted successfully',
+          type: 'success',
+          autoClose: false,
+        });
+      })
+      .catch((error) => {
+        setAlert({
+          active: true,
+          message: error.message,
+          type: 'error',
+          autoClose: false,
+        });
+      });
+  };
+
   return (
     <>
+      <Alert alert={alert} handleClose={toggleAlert} />
       <div className="lg:flex lg:items-center lg:justify-between mb-8">
         <div className="min-w-0 flex-1">
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">List of Products</h2>
@@ -58,12 +83,6 @@ export default function Products() {
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Edit
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Delete
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -86,14 +105,21 @@ export default function Products() {
                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                          Edit
-                        </a>
+                        <Link href={`/dashboard/edit/${product.id}`}>
+                          Editar
+                        </Link>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                          Delete
-                        </a>
+                        <span className="sm:ml-3">
+                          <button
+                            type="button"
+                            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            onClick={() => handleDelete(product.id)}
+                          >
+                            <FolderRemoveIcon className="-ml-0.5 mr-1.5 h-5 w-5" aria-hidden="true" />
+                            Remove
+                          </button>
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -105,7 +131,7 @@ export default function Products() {
       </div>
       {open ? (
         <Modal open={open} setOpen={setOpen}>
-          <AddProduct />
+          <FormProduct setAlert={setAlert} setOpen={setOpen} />
         </Modal>
       ) : null}
     </>

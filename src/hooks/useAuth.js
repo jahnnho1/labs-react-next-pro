@@ -50,17 +50,17 @@ function useProvideAuth() {
     }
   };
 
-  const signOut = () => {
-    return new Promise((resolve) => {
-      setUser(false);
-      Cookie.remove('token');
-      resolve();
-    });
+  const logout = () => {
+    setUser(null);
+    Cookie.remove('token');
+    const headers = new Headers();
+    headers.delete('Authorization');
+    window.location.href = '/login';
   };
 
   return {
     user,
     signIn,
-    signOut,
+    logout,
   };
 }
