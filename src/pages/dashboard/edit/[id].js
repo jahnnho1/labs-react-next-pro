@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import FormProduct from '@components/FormProduct';
 import { useRouter } from 'next/router';
 import endPoints from '@services/api';
+import SecurityLayout from '@layout/SecurityLayout';
 
 export default function Edit() {
   const [product, setProduct] = useState({});
@@ -16,8 +17,11 @@ export default function Edit() {
       setProduct(data);
     }
     getProduct();
+  }, [router.isReady, router.query]);
 
-  }, []);
-
-  return <FormProduct product={product} />;
+  return (
+    <SecurityLayout>
+      <FormProduct product={product} />
+    </SecurityLayout>
+  );
 }

@@ -42,6 +42,7 @@ export default function FormProduct({ setOpen, setAlert, product }) {
         });
     }
   };
+  
   return (
     <form ref={formRef} onSubmit={handleSubmit}>
       <div className="space-y-12">

@@ -28,9 +28,9 @@ export default function Header() {
 
   const navigation = [
     { name: 'Home', href: '/', current: true, role: 'none' },
-    { name: 'Dashboard', href: '/dashboard/', current: false, role: 'admin' },
-    { name: 'Products', href: '/dashboard/products', current: false, role: 'customer' },
     { name: 'Login', href: '/login', current: false, role: 'login' },
+    { name: 'Dashboard', href: '/dashboard', current: false, role: 'customer' },
+    { name: 'Products', href: '/dashboard/products', current: false, role: 'customer' },    
   ];
   const userNavigation = [
     { name: 'Your Profile', href: '#', role: 'customer' },
