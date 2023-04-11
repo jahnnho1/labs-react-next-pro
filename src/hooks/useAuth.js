@@ -40,9 +40,9 @@ function useProvideAuth() {
         };
         const response = await fetch(endPoints.auth.profile, options);
         const data = await response.json();
-        const json = JSON.stringify(data);
+        const json = JSON.stringify({...data, avatar: 'https://cdna.artstation.com/p/assets/images/images/046/235/272/smaller_square/pixel-arts-de-un-nino-random-ranita-uwu.jpg?1644605499'});
         Cookie.set('user-token', json);
-        setUser(data);
+        setUser({...data, avatar: 'https://cdna.artstation.com/p/assets/images/images/046/235/272/smaller_square/pixel-arts-de-un-nino-random-ranita-uwu.jpg?1644605499' });
         return data;
       } else {
         throw new Error('Invalid email or password');

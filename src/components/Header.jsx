@@ -33,10 +33,10 @@ export default function Header() {
     { name: 'Login', href: '/login', current: false, role: 'login' },
   ];
   const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
+    { name: 'Your Profile', href: '#', role: 'customer' },
+    { name: 'Settings', href: '#', role: 'customer' },
   ];
-  
+
   return (
     <>
       <Disclosure as="nav" className="bg-gray-800">
@@ -57,8 +57,7 @@ export default function Header() {
                               {item.name}
                             </a>
                           );
-                        }
-                        else if (item.role === 'login' && Object.keys(userData).length === 0) {
+                        } else if (item.role === 'login' && Object.keys(userData).length === 0) {
                           return (
                             <a key={`navDesktop-${item.name}`} href={item.href} className={classNames(item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'px-3 py-2 rounded-md text-sm font-medium')} aria-current={item.current ? 'page' : undefined}>
                               {item.name}
@@ -111,16 +110,26 @@ export default function Header() {
 
             <Disclosure.Panel className="md:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                {navigation.map((item) => (
-                  <Disclosure.Button key={item.name} as="a" href={item.href} className={classNames(item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block px-3 py-2 rounded-md text-base font-medium')} aria-current={item.current ? 'page' : undefined}>
-                    {item.name}
-                  </Disclosure.Button>
-                ))}
+                {navigation.map((item) => {
+                  if ((item.role === 'customer' && userData.role === 'customer') || item.role === 'none') {
+                    return (
+                      <Disclosure.Button key={item.name} as="a" href={item.href} className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">
+                        {item.name}
+                      </Disclosure.Button>
+                    );
+                  } else if (item.role === 'login' && Object.keys(userData).length === 0) {
+                    return (
+                      <Disclosure.Button key={item.name} as="a" href={item.href} className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">
+                        {item.name}
+                      </Disclosure.Button>
+                    );
+                  }
+                })}
               </div>
               <div className="pt-4 pb-3 border-t border-gray-700">
                 <div className="flex items-center px-5">
                   <div className="flex-shrink-0">
-                    <Image className="h-10 w-10 rounded-full" src={userData.imageUrl} alt="" width={100} height={100} />
+                    <Image className="h-10 w-10 rounded-full" src="https://cdna.artstation.com/p/assets/images/images/046/235/272/smaller_square/pixel-arts-de-un-nino-random-ranita-uwu.jpg?1644605499" alt="" width={100} height={100} />
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium leading-none text-white">{userData.name}</div>
@@ -132,11 +141,21 @@ export default function Header() {
                   </button>
                 </div>
                 <div className="mt-3 px-2 space-y-1">
-                  {userNavigation.map((item) => (
-                    <Disclosure.Button key={item.name} as="a" href={item.href} className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">
-                      {item.name}
-                    </Disclosure.Button>
-                  ))}
+                  {userNavigation.map((item) => {
+                    if ((item.role === 'customer' && userData.role === 'customer') || item.role === 'none') {
+                      return (
+                        <Disclosure.Button key={item.name} as="a" href={item.href} className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">
+                          {item.name}
+                        </Disclosure.Button>
+                      );
+                    } else if (item.role === 'login' && Object.keys(userData).length === 0) {
+                      return (
+                        <Disclosure.Button key={item.name} as="a" href={item.href} className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700">
+                          {item.name}
+                        </Disclosure.Button>
+                      );
+                    }
+                  })}
                 </div>
               </div>
             </Disclosure.Panel>
