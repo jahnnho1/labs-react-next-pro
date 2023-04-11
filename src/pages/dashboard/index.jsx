@@ -29,10 +29,6 @@ export default function Dashboard() {
   const categoryCount = categoryNames?.map((category) => category.name);
   const countOcurrences = (data) => data.reduce((object, index) => ((object[index] = ++object[index] || 1), object), {});
 
-  if (isLoading) {
-    <Loading />;
-  }
-
   const data = {
     datasets: [
       {
